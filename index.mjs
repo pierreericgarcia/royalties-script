@@ -122,7 +122,14 @@ const TRACKS = [
 ]
 
 function getLastSemester() {
-    const semesters = fs.readdirSync('./reports').sort()
+    const semesters = fs.readdirSync('./reports').sort((a, b) => {
+        const [semA, yearA] = a.split('-')
+        const [semB, yearB] = b.split('-')
+        if (yearA !== yearB) {
+            return yearA.localeCompare(yearB)
+        }
+        return semA.localeCompare(semB)
+    })
     return semesters[semesters.length - 1]
 }
 
