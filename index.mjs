@@ -1,6 +1,9 @@
 import fs from 'fs'
 import csv from 'csv-parser'
 import { format } from 'fast-csv'
+import chalk from 'chalk'
+
+console.log(chalk.green.bold('Lancement du script ! 🚀'))
 
 const rightHolders = {
     alexandreLegallicier: 'Alexandre Legallicier',
@@ -204,4 +207,7 @@ processReport((earnings) => {
 
     const mailPath = `${mailDir}/mail.txt`
     fs.writeFileSync(mailPath, emailBody, 'utf8')
+    console.log(chalk.yellow(`- ${mailDir}/recap.csv`))
+    console.log(chalk.yellow(`- ${mailPath}`))
+    console.log(chalk.green.bold('\nLe script est terminé ! ✅'))
 })
