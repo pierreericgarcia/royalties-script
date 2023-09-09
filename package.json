@@ -10,10 +10,12 @@
   "dependencies": {
     "boxen": "^7.1.0",
     "chalk": "^5.2.0",
+    "csv-parser": "^3.0.0",
     "eslint-config-node": "^4.1.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.0.0",
+    "fast-csv": "^4.3.6",
     "inquirer": "^9.2.2",
     "lodash": "^4.17.21"
   },
