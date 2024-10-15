@@ -122,14 +122,17 @@ const TRACKS = [
 ]
 
 function getLastSemester() {
-    const semesters = fs.readdirSync('./reports').sort((a, b) => {
-        const [semA, yearA] = a.split('-')
-        const [semB, yearB] = b.split('-')
-        if (yearA !== yearB) {
-            return yearA.localeCompare(yearB)
-        }
-        return semA.localeCompare(semB)
-    })
+    const semesters = fs
+        .readdirSync('./reports')
+        .filter((file) => file !== '.DS_Store')
+        .sort((a, b) => {
+            const [semA, yearA] = a.split('-')
+            const [semB, yearB] = b.split('-')
+            if (yearA !== yearB) {
+                return yearA.localeCompare(yearB)
+            }
+            return semA.localeCompare(semB)
+        })
     return semesters[semesters.length - 1]
 }
 
@@ -137,16 +140,22 @@ const lastSemester = getLastSemester()
 
 function processReport(callback) {
     const earnings = {}
-    const reports = fs.readdirSync(`./reports/${lastSemester}`).sort()
+    const reports = fs
+        .readdirSync(`./reports/${lastSemester}`)
+        .filter((file) => file !== '.DS_Store')
+        .sort()
 
     let processedReports = 0
 
     reports.forEach((report) => {
         fs.createReadStream(`./reports/${lastSemester}/${report}`)
+            .filter((file) => file !== '.DS_Store')
             .pipe(csv({ separator: ';' }))
             .on('data', (row) => {
                 const isrc = row['ISRC']
-                const netRevenue = parseFloat(row['Revenu Net'])
+                const netRevenue = parseFloat(
+                    row['Revenu Net'].replace(',', '.')
+                )
 
                 const track = TRACKS.find((t) => t.isrc === isrc)
                 if (track) {
@@ -158,10 +167,12 @@ function processReport(callback) {
                                 'Ayant-Droit': rightHolder.name,
                                 Pourcentage: rightHolder.percentage * 100,
                                 'Revenus Net': 0,
+                                'Revenus Totaux': 0,
                             }
                         }
                         earnings[key]['Revenus Net'] +=
                             netRevenue * rightHolder.percentage
+                        earnings[key]['Revenus Totaux'] += netRevenue
                     }
                 }
             })
@@ -188,6 +199,7 @@ processReport((earnings) => {
 
     Object.values(earnings).forEach((e) => {
         e['Revenus Net'] = e['Revenus Net'].toFixed(2)
+        e['Revenus Totaux'] = e['Revenus Totaux'].toFixed(2)
         csvStream.write(e)
 
         if (!totalEarningsPerRightHolder[e['Ayant-Droit']]) {
